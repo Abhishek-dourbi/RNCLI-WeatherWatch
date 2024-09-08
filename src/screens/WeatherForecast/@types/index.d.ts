@@ -16,8 +16,17 @@ export interface WeatherForecastState {
     dailyWeatherData: DailyWeatherStateData[]
 }
 
+interface LocationData {
+    latitude: number;
+    longitude: number;
+    name: string;
+    id: number;
+}
+
 interface GeoCodingState {
     latitude: number;
     longitude: number;
     locationName: string;
+
+    searchLocations: LocationData[];
 }

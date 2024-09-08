@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -6,17 +6,25 @@ import {
   Image,
   Alert,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import {useSimpleReducer} from '../../hooks/reducer';
 import {getWeatherData} from '../../api/weatherForecast';
 import {
   DailyWeatherStateData,
   GeoCodingState,
+  LocationData,
   WeatherForecastState,
 } from './@types';
 import getWeatherImage from '../../helpers/getWeatherImage';
 import {formatDayName} from '../../utils/date';
 import styles from './styles';
+import {getLocation} from '../../api/geocoding';
+import SearchInput from '../../components/SearchInput';
+import SuggestionsModal from '../../components/SuggestionsModal';
+import {
+  SuggestionModalRef,
+} from '../../components/SuggestionsModal/@types';
 
 const InitialWeatherForecastState = {
   currentTime: '',
@@ -29,6 +37,7 @@ const InitialGeocodingState = {
   latitude: 28.6358,
   longitude: 77.2245,
   locationName: 'New Delhi',
+  searchLocations: [],
 };
 
 const Home = () => {
@@ -37,9 +46,31 @@ const Home = () => {
   const [geocodingState, updateGeocodingState] =
     useSimpleReducer<GeoCodingState>(InitialGeocodingState);
 
+  const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const modalRef = useRef<SuggestionModalRef>(null);
+
   const {currentTime, currentTemp, currentWeatherCode, dailyWeatherData} =
     weatherState;
-  const {latitude, longitude, locationName} = geocodingState;
+  const {latitude, longitude, locationName, searchLocations} = geocodingState;
+
+  const fetchLocation = async (query: string) => {
+    try {
+      const res = await getLocation(query);
+
+      const data = res?.map(location => ({
+        id: location.id,
+        name: location.name,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      }));
+
+      updateGeocodingState({
+        searchLocations: data,
+      });
+    } catch (err: any) {
+      Alert.alert(err.message);
+    }
+  };
 
   const fetchWeatherData = async () => {
     try {
@@ -73,7 +104,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchWeatherData();
-  }, []);
+  }, [latitude, longitude]);
 
   const renderDailyWeatherData = (
     item: DailyWeatherStateData,
@@ -101,9 +132,61 @@ const Home = () => {
 
   const {description, image} = getWeatherImage(currentWeatherCode) || {};
 
+  const onChangeLocation = (text: string) => {
+    clearTimeout(timerRef.current);
+
+    timerRef.current = setTimeout(() => {
+      fetchLocation(text);
+    }, 500);
+  };
+
+  const onPressLocation = (item: LocationData) => () => {
+    modalRef.current?.close();
+    updateGeocodingState({
+      latitude: item.latitude,
+      longitude: item.longitude,
+      locationName: item.name,
+    });
+  };
+
+  const renderLocations = (item: LocationData, index: number) => {
+    return (
+      <React.Fragment key={item.id}>
+        <TouchableOpacity
+          onPress={onPressLocation(item)}
+          style={[
+            styles.locationItem,
+            index < searchLocations.length - 1 ? {} : styles.lastLocationItem,
+          ]}>
+          <Text style={styles.locationItemText}>{item.name}</Text>
+        </TouchableOpacity>
+        <View style={styles.locationItemSpacer} />
+      </React.Fragment>
+    );
+  };
+
+  const onFocus = () => {
+    if (modalRef.current) {
+      modalRef.current?.show();
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <SuggestionsModal
+        data={searchLocations}
+        renderText={renderLocations}
+        ref={modalRef}
+      />
+
+      <ScrollView
+        stickyHeaderIndices={[0]}
+        showsVerticalScrollIndicator={false}
+        style={styles.scrollViewContainer}>
+        <View style={styles.inputContainer}>
+          <SearchInput onChangeText={onChangeLocation} onFocus={onFocus} />
+        </View>
+
         <View style={styles.forecastContainer}>
           <Text style={styles.locationText}>{locationName}</Text>
           <Text style={styles.currentTempText}>{currentTemp}°</Text>

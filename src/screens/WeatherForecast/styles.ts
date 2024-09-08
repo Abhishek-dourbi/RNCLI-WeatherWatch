@@ -7,9 +7,15 @@ export default StyleSheet.create({
     backgroundColor: Colors.blue,
     flex: 1,
   },
+  scrollViewContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  inputContainer: {
+    marginTop: 20
+  },
   forecastContainer: {
     alignItems: 'center',
-    marginTop: 40,
   },
   locationText: {
     color: Colors.white,
@@ -22,17 +28,18 @@ export default StyleSheet.create({
   currentForecastText: {
     color: Colors.white,
     fontSize: 20,
-    marginRight: 10
+    marginRight: 10,
   },
   currentForecastImage: {
     height: 200,
     width: 200,
   },
+
   dailyForecastContainer: {
     paddingTop: 20,
     backgroundColor: Colors.darkBlue,
     borderRadius: 10,
-    width: SCREEN_WIDTH - 40,
+    width: '100%',
     alignSelf: 'center',
   },
   dailyForecastText: {
@@ -48,7 +55,7 @@ export default StyleSheet.create({
     alignSelf: 'center',
   },
   spacer: {
-    height: 40
+    height: 40,
   },
   dailyForecastItemContainer: {
     flexDirection: 'row',
@@ -70,4 +77,23 @@ export default StyleSheet.create({
   minTempText: {
     color: Colors.grey,
   },
+
+  locationItem: {
+    backgroundColor: Colors.white,
+    paddingVertical: 15,
+    paddingLeft: 10,
+    width: SCREEN_WIDTH - 40,
+    alignSelf: 'center',
+  },
+  lastLocationItem: {
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  locationItemText: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  locationItemSpacer: {
+    height: 1
+  }
 });
