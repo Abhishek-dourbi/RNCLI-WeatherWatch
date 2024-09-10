@@ -12,4 +12,10 @@ export default StyleSheet.create({
     height: SCREEN_HEIGHT,
     width: SCREEN_WIDTH,
   },
+  loadingContainer: {
+    flex: 1, 
+    justifyContent: 'flex-start', 
+    alignItems: 'center', 
+    paddingTop: 20
+  }
 });

@@ -6,14 +6,11 @@ import {
   Alert,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import {useSimpleReducer} from '../../hooks/reducer';
 import {getWeatherData} from '../../api/weatherForecast';
-import {
-  GeoCodingState,
-  LocationData,
-  WeatherForecastState,
-} from './@types';
+import {GeoCodingState, LocationData, WeatherForecastState} from './@types';
 import getWeatherImage from '../../helpers/getWeatherImage';
 import styles from './styles';
 import {getLocation} from '../../api/geocoding';
@@ -22,12 +19,14 @@ import SuggestionsModal from '../../components/SuggestionsModal';
 import {SuggestionModalRef} from '../../components/SuggestionsModal/@types';
 import CurrentWeather from './components/CurrentWeather';
 import DailyWeather from './components/DailyWeather';
+import Colors from '../../themes/colors';
 
 const InitialWeatherForecastState = {
   currentTime: '',
   currentTemp: 0,
   currentWeatherCode: null,
   dailyWeatherData: [],
+  isWeatherForecastLoading: false,
 };
 
 const InitialGeocodingState = {
@@ -35,6 +34,7 @@ const InitialGeocodingState = {
   longitude: 77.2245,
   locationName: 'New Delhi',
   searchLocations: [],
+  isGeocodingLoading: false,
 };
 
 const Home = () => {
@@ -46,12 +46,26 @@ const Home = () => {
   const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const modalRef = useRef<SuggestionModalRef>(null);
 
-  const {currentTime, currentTemp, currentWeatherCode, dailyWeatherData} =
-    weatherState;
-  const {latitude, longitude, locationName, searchLocations} = geocodingState;
+  const {
+    currentTime,
+    currentTemp,
+    currentWeatherCode,
+    dailyWeatherData,
+    isWeatherForecastLoading,
+  } = weatherState;
+  const {
+    latitude,
+    longitude,
+    locationName,
+    searchLocations,
+    isGeocodingLoading,
+  } = geocodingState;
 
   const fetchLocation = async (query: string) => {
     try {
+      updateGeocodingState({
+        isGeocodingLoading: true,
+      });
       const res = await getLocation(query);
 
       const data = res?.map(location => ({
@@ -63,14 +77,21 @@ const Home = () => {
 
       updateGeocodingState({
         searchLocations: data,
+        isGeocodingLoading: false,
       });
     } catch (err: any) {
+      updateGeocodingState({
+        isGeocodingLoading: false,
+      });
       Alert.alert(err.message);
     }
   };
 
   const fetchWeatherData = async () => {
     try {
+      updateWeatherState({
+        isWeatherForecastLoading: true,
+      });
       const res = await getWeatherData({
         latitude,
         longitude,
@@ -93,8 +114,12 @@ const Home = () => {
         currentTemp: res.current.temperature_2m,
         currentWeatherCode: res.current.weather_code,
         dailyWeatherData: dailyData,
+        isWeatherForecastLoading: false,
       });
     } catch (err: any) {
+      updateWeatherState({
+        isWeatherForecastLoading: false,
+      });
       Alert.alert(err.message);
     }
   };
@@ -119,6 +144,7 @@ const Home = () => {
       latitude: item.latitude,
       longitude: item.longitude,
       locationName: item.name,
+      searchLocations: [],
     });
   };
 
@@ -147,30 +173,37 @@ const Home = () => {
   return (
     <SafeAreaView style={styles.container}>
       <SuggestionsModal
+        isLoading={isGeocodingLoading}
         data={searchLocations}
         renderText={renderLocations}
         ref={modalRef}
       />
 
-      <ScrollView
-        stickyHeaderIndices={[0]}
-        showsVerticalScrollIndicator={false}
-        style={styles.scrollViewContainer}>
-        <View style={styles.inputContainer}>
-          <SearchInput onChangeText={onChangeLocation} onFocus={onFocus} />
+      {isWeatherForecastLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size={'large'} color={Colors.white} />
         </View>
+      ) : (
+        <ScrollView
+          stickyHeaderIndices={[0]}
+          showsVerticalScrollIndicator={false}
+          style={styles.scrollViewContainer}>
+          <View style={styles.inputContainer}>
+            <SearchInput onChangeText={onChangeLocation} onFocus={onFocus} />
+          </View>
 
-        <CurrentWeather
-          locationName={locationName}
-          currentTemp={currentTemp}
-          description={description}
-          image={image}
-        />
+          <CurrentWeather
+            locationName={locationName}
+            currentTemp={currentTemp}
+            description={description}
+            image={image}
+          />
 
-        <DailyWeather data={dailyWeatherData} currentTime={currentTime} />
+          <DailyWeather data={dailyWeatherData} currentTime={currentTime} />
 
-        <View style={styles.spacer} />
-      </ScrollView>
+          <View style={styles.spacer} />
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

@@ -1,9 +1,10 @@
-import {View, Text, TouchableOpacity, Keyboard, BackHandler} from 'react-native';
+import {View, TouchableOpacity, Keyboard, BackHandler, ActivityIndicator} from 'react-native';
 import React, {forwardRef, useEffect, useImperativeHandle, useState} from 'react';
 import styles from './styles';
 import {SuggestionModalProps, SuggestionModalRef} from './@types';
+import Colors from '../../themes/colors';
 
-const SuggestionsModal = forwardRef(<T,>({data, renderText}: SuggestionModalProps<T>, ref: React.Ref<SuggestionModalRef>) => {
+const SuggestionsModal = forwardRef(<T,>({data = [], renderText, isLoading}: SuggestionModalProps<T>, ref: React.Ref<SuggestionModalRef>) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const show = () => {
@@ -51,7 +52,12 @@ const SuggestionsModal = forwardRef(<T,>({data, renderText}: SuggestionModalProp
     <TouchableOpacity
       onPress={close}
       style={styles.container}>
-      {data.map(renderText)}
+        {
+          isLoading ? 
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size={'large'} color={Colors.white} />
+            </View> : 
+            data.map(renderText)}
     </TouchableOpacity>
   );
 });

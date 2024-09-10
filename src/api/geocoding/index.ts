@@ -12,7 +12,7 @@ export const getLocation = async (query: string): Promise<GeocodingResponse[]> =
             }
         );
 
-        return res?.data?.results;
+        return res?.data?.results || [];
     } catch(err: any) {
         throw new Error(err.message || 'Something went wrong');
     }

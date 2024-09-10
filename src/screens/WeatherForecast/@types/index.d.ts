@@ -13,7 +13,8 @@ export interface WeatherForecastState {
     currentTemp: number;
     currentWeatherCode: WeatherCode | null;
     
-    dailyWeatherData: DailyWeatherStateData[]
+    dailyWeatherData: DailyWeatherStateData[];
+    isWeatherForecastLoading: boolean
 }
 
 interface LocationData {
@@ -29,4 +30,5 @@ interface GeoCodingState {
     locationName: string;
 
     searchLocations: LocationData[];
+    isGeocodingLoading: boolean;
 }

@@ -7,6 +7,11 @@ export default StyleSheet.create({
     backgroundColor: Colors.blue,
     flex: 1,
   },
+  loadingContainer: {
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center'
+  },
   scrollViewContainer: {
     flex: 1,
     paddingHorizontal: 20,
