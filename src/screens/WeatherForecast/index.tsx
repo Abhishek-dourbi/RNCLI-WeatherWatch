@@ -180,7 +180,7 @@ const Home = () => {
       />
 
       {isWeatherForecastLoading ? (
-        <View style={styles.loadingContainer}>
+        <View style={styles.loadingContainer} testID="loading-indicator">
           <ActivityIndicator size={'large'} color={Colors.white} />
         </View>
       ) : (

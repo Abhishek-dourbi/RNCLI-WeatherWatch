@@ -8,6 +8,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
+    "update-snapshot": "jest --updateSnapshot",
     "compile": "tsc"
   },
   "dependencies": {

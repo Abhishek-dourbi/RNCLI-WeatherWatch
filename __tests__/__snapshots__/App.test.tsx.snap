@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`App Component with WeatherForecast should match the snapshot 1`] = `
+<RCTSafeAreaView
+  style={
+    {
+      "backgroundColor": "#20A7DB",
+      "flex": 1,
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "flex": 1,
+        "justifyContent": "center",
+      }
+    }
+    testID="loading-indicator"
+  >
+    <ActivityIndicator
+      color="#fff"
+      size="large"
+    />
+  </View>
+</RCTSafeAreaView>
+`;

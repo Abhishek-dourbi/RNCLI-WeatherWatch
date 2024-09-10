@@ -64,6 +64,16 @@ describe('App Component with WeatherForecast', () => {
     mockGetLocation.mockResolvedValue(mockLocationData as GeocodingResponse[]);
   });
 
+  it('should render loading indicator while fetching weather data', async () => {    
+    const { getByTestId, queryByTestId } = render(<App />);
+
+    expect(getByTestId('loading-indicator')).toBeTruthy();
+
+    await waitFor(() => {
+      expect(queryByTestId('loading-indicator')).toBeNull();
+    });
+  });
+
   it('should render WeatherForecast and display the weather data', async () => {
     const {getByText, getByTestId} = render(<App />);
 
@@ -76,7 +86,11 @@ describe('App Component with WeatherForecast', () => {
   });
 
   it('should handle location input and display suggestions', async () => {
-    const {getByPlaceholderText, getByText} = render(<App />);
+    const {getByPlaceholderText, getByText, queryByTestId} = render(<App />);
+
+    await waitFor(() => {
+      expect(queryByTestId('loading-indicator')).toBeNull();
+    });
 
     const input = getByPlaceholderText('Search...');
 
