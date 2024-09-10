@@ -191,7 +191,7 @@ const Home = () => {
           <Text style={styles.locationText}>{locationName}</Text>
           <Text style={styles.currentTempText}>{currentTemp}°</Text>
           <Text style={styles.currentForecastText}>{description}</Text>
-          <Image source={{uri: image}} style={styles.currentForecastImage} />
+          <Image testID='current-forecast-image' source={{uri: image}} style={styles.currentForecastImage} />
         </View>
 
         <View style={styles.dailyForecastContainer}>
